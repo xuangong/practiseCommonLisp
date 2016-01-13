@@ -1,4 +1,3 @@
-
 `(and ,(list 1 2 3))
 `(and ,@(list 1 2 3))
 
@@ -44,7 +43,6 @@
 
 (do-primes-1 (ending-value 0 19)
   (print ending-value))
-
 
 (defmacro once-only ((&rest names) &body body)
   (let ((gensyms (loop for n in names collect (gensym))))

@@ -16,7 +16,6 @@
 ;;; C-c I - slime-inspect
 ;;; C-h m - Holy grail : )
 
-
 ;;; loop macro tut
 (loop for i below 5 collect i)
 (loop :for i :below 5 :collect i)
