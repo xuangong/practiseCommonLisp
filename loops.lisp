@@ -92,3 +92,36 @@
 (loop :for (x y) :in *triples* :collect (list x (* y y)))
 
 (loop :for (x . y) :in *triples* :collect (list x y))
+
+;; 注意这个时候list和小引号不一样，需要其动态的值得用list
+(loop
+  for item in *numbers*
+  for i from 1 to 10
+  do (print (list i item)))
+
+;; 关键字加不加冒号都可以
+(loop for (x . y) in *triples* collect (list x y))
+
+;;; 这种loop很tricky
+;;; 先都初始化然后循环五次，用(+ y x)替换y，后面用的y来赋值给x
+(loop repeat 5
+      for y = 1 then (progn
+                       (print "1:")
+                       (print (list y x))
+                       (+ y x))
+      for x = 0 then (progn
+                       (print "2:")
+                       (print (list y x))
+                       y)
+      collect y)
+
+;;; return range
+(block outer
+  (loop for i from 0 return 100)        ; return out of loop
+  (print "This will print")
+  200)
+
+(block outer
+  (loop for i from 0 do (return-from outer 100))  ; return out of outer blocak
+  (print "This will print")
+  200)

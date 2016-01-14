@@ -632,3 +632,58 @@
 (values-list (multiple-value-list (values 1 2)))
 
 ;;; ---------eval-when----------
+
+;; (in-package "some package")
+;;; :compile-toplevel 在编译器求值其子形式
+;;; :load-toplevel 把子形式作为顶层形式来编译
+;;; 加载fasl设置package是由于:load-toplevel
+;;; 加载源码设置package是由于:execute
+;; (eval-when (:compile-toplevel :load-toplevel :execute)
+;;   (setq *package* (sb-int:find-undeleted-package-or-lose "some package")))
+
+;;; ------------PACKAGE SYMBOL-------------
+(find-symbol "setf")
+
+(defpackage :com.gigamonkeys.email-db
+  (:use :common-lisp))
+;;; 等价于
+(defpackage "COM.GIGAMONKEYS.EMAIL-DB"
+  (:use "COMMON-LISP"))
+
+;;; 修改*package*的值
+;; 编译的时候不会改变*package*的值但是划定了下面函数的包范围
+(in-package :common-lisp-user)
+(defun hello-world ()
+  (format t "hello world."))
+
+(in-package :com.gigamonkeys.email-db)
+(defun hello-world ()
+  (format t "gigamonkeys hello world."))
+
+
+;;; text可以使用common-lisp和email导出的符号
+(defpackage :com.gigamonkeys.text-db
+  (:use :common-lisp)
+  (:export :open-db :save :store))
+
+(defpackage :com.gigamonkeys.email-db
+  (:use :common-lisp :com.gigamonkeys.text-db))
+
+
+;;; 导出单独的名字空间
+(defpackage :com.gigamonkeys.email-db
+  (:use :common-lisp :com.gigamonkeys.text-db)
+  (:import-from :com.acme.email :parse-email-address))
+
+;;; shadow表示build-index这个符号不用继承来的名字空间
+(defpackage :com.gigamonkeys.email-db
+  (:use :common-lisp :com.gigamonkeys.text-db :com.acme.text)
+  (:import-from :com.acme.email :parse-email-address)
+  (:shadow :build-index))
+
+;;; 发生继承来的名字冲突时，比如save冲突后，用shadowing-import-from来指定使用com.gigamonkeys.text-db的save符号
+(defpackage :com.gigamonkeys.email-db
+  (:use :common-lisp :com.gigamonkeys.text-db :com.acme.text)
+  (:import-from :com.acme.email :parse-email-address)
+  (:shadow :build-index)
+  (:shadowing-import-from :com.gigamonkeys.text-db :save))
